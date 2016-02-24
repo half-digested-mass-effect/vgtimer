@@ -1,0 +1,24 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'vgtimer.VGTimerInterface'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+jar {
+    baseName = 'vgtimer'
+    version =  '0.0.1'
+}
+
+dependencies {
+    compile 'com.github.tulskiy:jkeymaster:1.2'
+    compile 'org.slf4j:slf4j-jdk14:1.7.13'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.11'
+}
