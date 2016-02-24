@@ -67,14 +67,14 @@ public class VGTimerInterface extends JFrame implements HotKeyListener
 		individualResetKeys = new HashMap<>();
 		
 		// Define keys that apply to all timers.
-		resetAndStartKeyStroke = KeyStroke.getKeyStroke(config.getResetKeys());
-		stopKeyStroke = KeyStroke.getKeyStroke(config.getStopKeys());
+		resetAndStartKeyStroke = config.getResetKeys();
+		stopKeyStroke = config.getStopKeys();
 
 		// Define keys for resetting individual timers and add them to the map.
-		individualResetKeys.put(KeyStroke.getKeyStroke(config.getRestartGreenKeys()), Timer.GREEN);
-		individualResetKeys.put(KeyStroke.getKeyStroke(config.getRestartBreakKeys()), Timer.BREAK);
-		individualResetKeys.put(KeyStroke.getKeyStroke(config.getRestartSegmentKeys()), Timer.SEGMENT);
-		individualResetKeys.put(KeyStroke.getKeyStroke(config.getRestartBlueKeys()), Timer.BLUE);
+		individualResetKeys.put(config.getRestartGreenKeys(), Timer.GREEN);
+		individualResetKeys.put(config.getRestartBreakKeys(), Timer.BREAK);
+		individualResetKeys.put(config.getRestartSegmentKeys(), Timer.SEGMENT);
+		individualResetKeys.put(config.getRestartBlueKeys(), Timer.BLUE);
 		
 		// Register the keys as global hotkeys.
 		final Provider provider = Provider.getCurrentProvider(true);
