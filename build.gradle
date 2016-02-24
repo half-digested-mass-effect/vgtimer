@@ -17,6 +17,7 @@ jar {
 dependencies {
     compile 'com.github.tulskiy:jkeymaster:1.2'
     compile 'org.slf4j:slf4j-jdk14:1.7.13'
+    compile 'com.pusher:pusher-http-java:0.9.3'
 }
 
 task wrapper(type: Wrapper) {

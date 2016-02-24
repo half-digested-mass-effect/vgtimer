@@ -1,22 +1,19 @@
 package vgtimer;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-
-import vgtimer.ValeGuardianTimer.Timer;
-
+import com.pusher.rest.Pusher;
 import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.Provider;
+import vgtimer.ValeGuardianTimer.Timer;
+
+import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VGTimerInterface extends JFrame implements HotKeyListener 
 {
@@ -34,6 +31,9 @@ public class VGTimerInterface extends JFrame implements HotKeyListener
 	private KeyStroke stopKeyStroke;
 	/** Maps a global hotkey to the timer it resets. */
 	private Map<KeyStroke, Timer> individualResetKeys;
+
+	private Pusher pusher;
+	private String pusherChannel;
 	
 	public static void main(String[] args)
 	{
@@ -101,7 +101,10 @@ public class VGTimerInterface extends JFrame implements HotKeyListener
        			System.exit(0);
         	}
         });
-		
+
+		pusher = config.getPusherClient();
+		pusherChannel = config.getPusherChannel();
+
 		// Initialise GUI elements.
 		background = new JPanel();
 		background.setVisible(true);
@@ -158,16 +161,19 @@ public class VGTimerInterface extends JFrame implements HotKeyListener
 	 * Handles the pressing of global hotkeys.
 	 */
 	@Override
-	public void onHotKey(HotKey hotKey) {
+	public void onHotKey(HotKey hotKey)
+	{
 		if (hotKey.keyStroke.equals(resetAndStartKeyStroke))
 		{
 			System.out.println("Key pressed: reset all");
 			vgTimer.resetAllAndStart();
+			triggerPusherEvent("reset", "all");
 		}
 		if (hotKey.keyStroke.equals(stopKeyStroke))
 		{
 			System.out.println("Key pressed: stop");
 			vgTimer.stop();
+			triggerPusherEvent("stop", "all");
 		}
 		
 		// Check if they pressed hotkey corresponds to one of the timers.
@@ -177,9 +183,10 @@ public class VGTimerInterface extends JFrame implements HotKeyListener
 			// The current hotkey is meant to reset a timer.
 			System.out.println("Key pressed: reset timer " + timerToReset);
 			timerToReset.reset();
+			triggerPusherEvent("reset", timerToReset.name().toLowerCase());
 		}
 	}
-	
+
 	/**
 	 * Formats a {@code long} value representing a time interval as a {@link String} for display in the GUI.
 	 * @param time The time to be displayed.
@@ -203,5 +210,19 @@ public class VGTimerInterface extends JFrame implements HotKeyListener
 		// Insert a dot as decimal separator to convert ms to s.
 		return timeAsString.substring(0, timeAsStringLength - 3) + "."
 				+ timeAsString.substring(timeAsStringLength - 3, timeAsStringLength - 2);
+	}
+
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+
+	private void triggerPusherEvent(String event, String timerName)
+	{
+		if (pusher == null)
+			return;
+
+		Map<String, String> params = new HashMap<>();
+		params.put("time", dateFormat.format(new Date()));
+		params.put("timer", timerName);
+
+		pusher.trigger(pusherChannel, event, params);
 	}
 }

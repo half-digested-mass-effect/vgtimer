@@ -1,5 +1,7 @@
 package vgtimer;
 
+import com.pusher.rest.Pusher;
+
 import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -68,5 +70,20 @@ public class Config
     public KeyStroke getRestartBlueKeys()
     {
         return parseKeys(properties.getProperty("blue"), "MINUS");
+    }
+
+    public Pusher getPusherClient()
+    {
+        String appId = properties.getProperty("pusher_app_id");
+        String apiKey = properties.getProperty("pusher_key");
+        String apiSecret = properties.getProperty("pusher_secret");
+
+        return new Pusher(appId, apiKey, apiSecret);
+    }
+
+    public String getPusherChannel()
+    {
+        String pusherChannel = properties.getProperty("pusher_channel");
+        return pusherChannel != null ? pusherChannel : "vgtimer";
     }
 }
